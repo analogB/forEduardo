@@ -1,0 +1,429 @@
+<!doctype html>
+<html>
+  <head>
+    <title>research study</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="perlin.js"></script>
+    <script src="jspsych-6.0.1.br/jspsych.js"></script>
+    <script src="jspsych-6.0.1.br/plugins/jspsych-instructions.js"></script>
+    <script src="jspsych-6.0.1.br/plugins/jspsych-darkroom.js"></script>
+    <script src="jspsych-6.0.1.br/plugins/jspsych-survey-likert.js"></script>
+    <link  href="jspsych-6.0.1.br/css/jspsych.css" rel="stylesheet" type="text/css"></link>
+  </head>
+  <body> </body>
+  <script>
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /* DEFINE DATA FILE SAVE NAME */
+    var expName = "darkroom01--"
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /* DEFINE STIMULI AND INSTRUCTION CONTENT */
+
+    var nTrials = 10;
+    var reward = 200000;
+    var mapRate = 0.75;
+    var forceFirstTrue = true;
+    var maxTrans = 1;
+    var pDec = 5000;
+    var sDec = 1000;
+    var mapDir = 5;
+
+    var transitionDelay = 100;
+    var indention =       25;
+    var turkSubmitCode =  42*42;
+
+    var studyTopic =
+                              "conversation and thinking";
+    var studyPurpose =
+                              "to better understand how people make predictions and become confident";
+    var taskDescription =
+                              "make predictions about uncertain patterns";
+    var debriefDescription =
+                              "This study is investigating how people's judgements, predictions, and choices are influenced by correspondences in structure and hidden information. The investigators will compare participant responses to statistical traits of the stimuli to better understand the role of chance and probability in human judgements."; //Full sentence
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /* DEFINE CONTACT INFO */
+    function indenter(nSpaces){ var out = [];
+                                for (i = 0; i < nSpaces; i++){
+                                    out += "&nbsp;"};
+                                return out};
+
+    var indent = indenter(indention);
+
+    var contactLandy =    indent + "<i>Dr. David Landy, Assistant Professor<br>"+
+                          indent + "Department of Psychological and Brain Sciences, Indiana University<br>"+
+                          indent + "1101 East 10th Street, Bloomington, IN 47405<br>"+
+                          indent + "(812) 336-4449 <br>"+
+                          indent + "dlandy at indiana dot edu</i></p>";
+
+    var contactGoldstone = indent + "<i>Dr. Rob Goldstone <br>"+
+                          indent + "Department of Psychological and Brain Sciences, Indiana University<br>"+
+                          indent + "1101 East 10th Street, Bloomington, IN 47405<br>"+
+                          indent + "(812) 855-4853 <br>"+
+                          indent + "rgoldsto at indiana dot edu</i></p>";
+
+    var contactInvestigator = contactLandy;
+
+    var investigatorName = "Dr. David Landy";
+    var departmentName = "Department of Psychological and Brain Sciences";
+    var institutionName = "Indiana University";
+
+   ////////////////////////////////////////////////////////////////////////////////////////////////////////
+   /* DEFINE NAVIGATION PROMPTS */
+    var keyAdvance = "<p><i>Press the spacebar to advance.</i></p>";
+    var buttonAdvance = "Make your response and click the <i>SUBMIT ANSWERS</i> button to continue.";
+    var noBrowserControl = "<i>Note: Browser controls will not work during this task. Clicking BACKWARD or REFRESH in the browser controls will <u>reset the entire task</u>.</i>";
+
+   ////////////////////////////////////////////////////////////////////////////////////////////////////////
+   /* DEFINE INSTRUCTIONS */
+
+   var invitation =
+                ["<div style='text-align:left'>You are invited to participate in a research study on "+studyTopic+", conducted by "+ investigatorName +" in the "+ departmentName + " at "+ institutionName +". Please read the following form and ask any questions before agreeing to be in the study.<br><br>"+
+                noBrowserControl + "<br><br></div>"
+                ];
+
+    var consentForm = //#for SONA Online
+                ['<div id="consent" style="text-align:left">'+
+                 '<p class="lead_right">IRB Study # 1511805816</p>'+
+                    '<b>INDIANA UNIVERSITY STUDY INFORMATION SHEET</b><br>'+
+                    '<b>Prediction During Communication</b><br><br>'+
+
+                    'You are invited to participate in a research study on conversation, conducted by Dr. David Landy in the Department of Psychological and Brain Sciences. You have been recruited to participate through the Psychological and Brain Sciences subject pool on SONA. Please read this form and ask any questions before agreeing to be in the study. <br><br>'+
+
+                    '<b>STUDY PURPOSE: </b><br>'+
+                    'The purpose of this study is to better understand how people make predictions during conversations.<br><br>'+
+
+                    '<b>NUMBER OF PEOPLE TAKING PART IN THE STUDY:</b><br>'+
+                    'If you agree to participate, you will be one of approximately 6000 subjects who will be participating in this research.<br><br>'+
+
+                    '<b>PROCEDURES FOR THE STUDY:</b><br>'+
+                    'If you agree to be in the study, you will be presented with several straightforward tasks to complete, including responding with key strokes to stimuli (e.g., images, videos, words) displayed on a computer monitor or completing a survey about your opinions. The entire session will take no longer than 120 minutes.  The study may occur over one or two sessions.<br><br>'+
+
+                    '<b>RISKS OF TAKING PART IN THE STUDY:</b><br>'+
+                    'Participation in this study involves a potential risk of loss of confidentiality. Professors are only told the total number of "credits" received by a student for participating in studies, so professors are not told whether or not a student participated in their particular study.<br><br>'+
+
+                    '<b>BENEFITS OF TAKING PART IN THE STUDY:</b><br>'+
+                    'An understanding of how people make predictions during conversation can help us understand how to improve communication. You benefit from this experience because you learn something about how an experiment is designed and conducted and what issues are of interest to cognitive scientists <br><br>'+
+
+                    '<b>ALTERNATIVES TO TAKING PART IN THE STUDY:</b><br>'+
+                    'An alternative to participating in the study is to choose not to participate. If you choose not to participate, you have an alternative way to earn credit; please talk to your instructor<br><br>'+
+
+                    '<b>PAYMENT:</b><br>'+
+                    'For participating in this study, you will receive course credit, equivalent to 0.5 credit for each half-hour of participation, up to maximum of 2 credits. <br><br>'+
+
+                    '<b>CONTACTS FOR QUESTIONS OR PROBLEMS:</b><br>'+
+                    'For questions about the study, contact the researcher Dr. David Landy at (812) 336-4449.  <br><br>'+
+
+                    'For questions about your rights as a research participant or to discuss problems, complaints or concerns about a research study, or to obtain information, or offer input, contact the IU Human Subjects Office: (812) 856-4242 or irb@iu.edu <br><br>'+
+
+                    '<b>VOLUNTARY NATURE OF STUDY:</b><br>'+
+                    'Taking part in this study is voluntary.  You may choose not to take part or may leave the study at any time.  Leaving the study will not result in any penalty or loss of benefits to which you are entitled and you will be compensated for your time up to that point.  Your decision whether or not to participate in this study will not affect your current or future relations with the investigator(s).<br><br>'+
+
+                    'Please print a copy of this information sheet if you would like it for your records.<br><br>'+
+
+                    'Form date: November 19, 2015 <br><br>' +
+                    '</div>']
+
+    var consentVoluntary =
+                 ["<p><b>VOLUNTARY NATURE OF STUDY</b></p>" +
+                  "<p>Taking part in this study is voluntary. You may choose not to take part or may leave the study at any time.<br> You may withdraw by closing your web browser.</p><br><br>"
+                  ];
+
+    var debrief =
+                 ["<div style='text-align:left'>"+
+                  "<b>THANK YOU</b><br>" +
+                  "Thank you for participating in our study. " + debriefDescription + " If you have questions concerning this study you may contact the lead investigator:<br><br>" +
+                  contactInvestigator +
+                  "<p><b><i>Advance to finalize your responses and receive your Mechanical Turk HIT code.</i></b></p><br><br> </div>"];
+                  // "<p><i>Press any key to receive the HIT code.</i></p>"];
+
+    var debriefSONA =
+                ["<div style='text-align:left'>"+
+                 "<b>THANK YOU</b><br>" +
+                 "Thank you for participating in our study. " + debriefDescription + " If you have questions concerning this study you may contact the lead investigator:<br><br>" +
+                 contactInvestigator +
+                 "<p><i><b><br>ADVANCE TO FINALIZE YOUR RESPONSES.</b></i></p><br><br><br></div>"];
+                 // "<p><i>Press any key to receive the HIT code.</i></p>"];
+
+    var secretCode =
+                 ["Please enter the code: <b>" + turkSubmitCode + "</b> in Mechanical Turk to complete this HIT." +
+                  "<p><i>You may now close this browser window.</i></p>"];
+
+    var finalText =
+                 ["<p><i>Thank you for participating in our study! Your responses have been recorded and you will receive credit within a couple of days. You may now close your browser window.</i></p>"];
+
+    var repeatSubject =
+                 ["<b>Qualification Error</b><br>" +
+                  "For statistical purposes, tasks for this study require unique participants. It appears that you have already participated in a task for this study. If you have questions concerning this study you may contact the lead investigator:<br>" +
+                  contactInvestigator +
+                  "<p><i>Please enter \"Repeat007\" for the HIT code.</i></p>"];
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /* DEFINE TEST STIMULI */
+    // note. all images must be placed in img/ folder named like: gold.png
+
+
+    function numberWithCommas(x){
+      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
+
+    var instr1 =
+                ["<b>Welcome to</b><br>"+
+                  "<img src='img/sprite/title.png'></img><br>"+
+                  "<img height='60px' src='img/sprite/map1T.png'></img><img height='80px'src='img/sprite/map2T.png'></img><img height='65px'src='img/sprite/map3T.png'></img><br><br>"+
+                  "Each week during the SPRITING season, a SPRITE is sighted.<br>"+
+                  "If you can locate and catch it, you will be generously rewarded with <b>$"+ numberWithCommas(reward) +"</b><br><br>"
+                ];
+    var instr2 =
+                ["But it takes money to make money.<br>"+
+                  "So every action you take to find the SPRITE will decrease your final reward.<br>"+
+                  "There are two possible actions you can take:<br><br>"+
+                  "<table align='center'><tr><td><img height='60px' src='img/sprite/balloon.png'></img></td><td><b>Go</b> somewhere to look for the sprite <br><i>(click on the left pane)</i></td></tr></table>"+
+                  "<b>Or</b><br>"+
+                  "<table align='center'><tr><td><img height='60px' src='img/sprite/merchant.png'></img></td><td><b>Look</b> at an informant's map <br><i>(click on the right pane)</i></td></tr></table><br><br>"+
+                  "The sprite must ultimately be found on location (left pane).<br>But sometimes using the map (right pane) can help you <br>find the sprite without overspending on travel.<br><br>"
+                ];
+
+    var instr3 =
+                ["You will be presented with two panes:<br>"+
+                  "<img border-width='1pt' border='solid' border-color='black' src='img/sprite/demomap1.png' height='400px'></img><br>"+
+                  "Clicking on squares in the left pane costs $"+numberWithCommas(pDec)+" and takes you on location to reveal a type of land and possibly find the sprite:<br>"+
+                  "<table align='center'><tr><td>Grass</td><td>Sand</td><td>Water</td></tr><tr><td><img src='img/map/m0/map3.png' height='60px'></img></td><td><img src='img/map/m0/map2.png'height='60px'></img></td><td><img src='img/map/m0/map1.png'height='60px'></img></td></tr></table>"
+                ];
+
+    var instr4 =
+                ["You will be presented with two panes:<br>"+
+                  "<img border-width='1pt' border='solid' border-color='black' src='img/sprite/demomap2.png' height='400px'></img><br>"+
+                  "Clicking on squares in the right pane costs $"+numberWithCommas(sDec)+" and reveals a map location and possibly a map location of the sprite:<br>"+
+                  "<table align='center'><tr><td>Map sprite indication is marked by a red X </td></tr><tr><td><img src='img/sprite/xspot.png' height='60px'></img></td></tr></table>"
+                ];
+
+    var instr5 =
+                ["<div style='font-size:32px'>About the Maps<br><br></div>"+
+                "<table><tr><td width='200px'><img src='img/sprite/balloon.png' width='150px'></img></td>"+
+                "<td width='600px'>Usually the informant's map is correct, but it's often shifted around <br>a bit for the area you are exploring. Like this:<br>"+
+                "<img src='img/sprite/shiftmap.png' width='600px'></img></td>"+
+                "<td width='200px' valign='bottom'><img src='img/sprite/merchant.png' width='150px'></img></td></tr></table><br><br>"
+                ];
+
+    var instr6 =
+                ["<div style='font-size:32px'>About the Maps<br><br></div>"+
+                "<table><tr><td width='200px'><img src='img/sprite/balloon.png' width='150px'></img></td>"+
+                "<td width='600px'>But sometimes the informant's map is just not at all relevant <br>to the area you are exploring. Like this:<br>"+
+                "<img src='img/sprite/badmap.png' width='600px'></img></td>"+
+                "<td width='200px' valign='bottom'><img src='img/sprite/merchant.png' width='150px'></img></td></tr></table><br><br>"
+                ];
+
+    var surveyPreamble = 'How much do you agree with the following statement.';
+
+    var likertLabels = ["Strongly Disagree", "Disagree","Slightly Disagree", "Neutral", "Slightly Agree" , "Agree", "Strongly Agree"];
+
+    var prompt1 = '<b>I played the game trying to maximize game money.</b>'
+    var prompt2 = '<b>I played the game trying to minimize playing time.</b>'
+    var prompt3 = '<b>I was disappointed when I did not find a sprite.</b>'
+    var prompt4 = '<b>I tried to validate the usefulness map each time before trying to find the sprite.</b>'
+    var prompt5 = '<b>Using the map seemed to complicated or unreliable.</b>'
+    var prompt6 = '<b>Playing around before receiving instructions was helpful to understanding the game.</b>'
+    var prompt7 = '<b>The instructions were helpful to understanding the game.</b>'
+    var prompt8 = '<b>A brief instruction reminder between game screens would have been helpful.</b>'
+
+
+    var surveyQuestions =
+                [{questions:[{prompt:prompt1, labels:likertLabels, required:true}]},
+                {questions:[{prompt:prompt2, labels:likertLabels, required:true}]},
+                {questions:[{prompt:prompt3, labels:likertLabels, required:true}]},
+                {questions:[{prompt:prompt4, labels:likertLabels, required:true}]},
+                {questions:[{prompt:prompt5, labels:likertLabels, required:true}]},
+                {questions:[{prompt:prompt6, labels:likertLabels, required:true}]},
+                {questions:[{prompt:prompt7, labels:likertLabels, required:true}]},
+                {questions:[{prompt:prompt8, labels:likertLabels, required:true}]}
+              ];
+
+
+    function stimMaker(n,p,fft){
+      var out =[]
+      for (i=0;i<n;i++){
+        if (fft && i==0){
+          out.push({stimulus:true});
+        } else {
+          out.push({stimulus:Math.random()<p});
+        }
+      };
+      return out;
+    };
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    /* DEFINE SAVE METHOD */
+    function saveData(filename, filedata){
+                          $.ajax({
+                                type:'post',
+                                cache: false,
+                                url: 'save_data.php', // this is the path to the above PHP script
+                                data: {filename: filename, filedata: filedata}
+                          });
+    };
+    var turkInfo = jsPsych.turk.turkInfo();
+    var mTurkID =  turkInfo.workerId;
+    //var mTurkID = 'tester01'
+
+    // var getUrlParameter = function getUrlParameter(sParam) {
+    //     var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+    //         sURLVariables = sPageURL.split('&'),
+    //         sParameterName,
+    //         i;
+    //
+    //     for (i = 0; i < sURLVariables.length; i++) {
+    //         sParameterName = sURLVariables[i].split('=');
+    //
+    //         if (sParameterName[0] === sParam) {
+    //             return sParameterName[1] === undefined ? true : sParameterName[1];
+    //         }
+    //     }
+    // };
+    //
+    // var SONAID = getUrlParameter('sonaid');
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /* DEFINE JSPSYCH BLOCKS */
+    var consent_block = {
+                  type:   "instructions",
+                  pages:    [invitation,consentForm,consentVoluntary],//invitation,consentForm,consentVoluntary,
+                  //key_forward: ['spacebar'],
+                  show_clickable_nav: true,
+                  //allow_backward: false,
+                  timing_post_trial: transitionDelay
+              };
+
+    var play_block = {
+              type: 'darkroom',
+              prompt: "<br><i>Here's the setup. Play around with it to see if you can figure out how the game works. <br>Try not to spend more than a minute on each screen like this.<br>(Hint: Click on the grey blocks until you run out of money or find a special sprite. Then press CONTINUE.)</i>",
+              timeline: [{stimulus: true},{stimulus: true},{stimulus:false}],
+              room_height: 280,
+              room_width: 280,
+              Xgrid: 8,
+              Ygrid: 8,
+              maxTranslation: maxTrans,
+              maxPrize: reward,
+              primaryDec: pDec,
+              surrogateDec: sDec,
+              mapDir: mapDir,
+              timing_post_trial: transitionDelay,
+              randomize_order: false,
+          };
+
+    var instructions_block = {
+              type:   "instructions",
+              pages:    [instr1,instr2,instr3,instr4,instr5,instr6],
+              //key_forward: ['spacebar'],
+              show_clickable_nav: true,
+              //allow_backward: false,
+              timing_post_trial: transitionDelay
+          };
+
+    var stims1 = stimMaker(nTrials,mapRate,forceFirstTrue);
+
+    var test1_block = {
+              type: 'darkroom',
+              //prompt: 'Hunt for the sprite or check the map. <br><br>',
+              timeline: stims1,
+              room_height: 350,
+              room_width: 350,
+              Xgrid: 8,
+              Ygrid: 8,
+              maxTranslation: maxTrans,
+              maxPrize: reward,
+              primaryDec: pDec,
+              surrogateDec: sDec,
+              mapDir: mapDir,
+              timing_post_trial: transitionDelay,
+              randomize_order: false
+          };
+
+    var survey_block = {
+              type: 'survey-likert',
+              preamble: surveyPreamble,
+              timeline: surveyQuestions
+    };
+
+    var debrief_block = {
+              type:   "instructions",
+              pages:   debrief,
+              allow_backward:false,
+              show_clickable_nav:true,
+              timing_post_trial: transitionDelay,
+              on_finish:  function(data){
+                                var time_foo = new Date();
+                                var experiment_time = time_foo.getTime();
+                                jsPsych.data.addProperties({turkID: mTurkID});
+                                //jsPsych.data.addProperties({sonaID: SONAID});
+                                //jsPsych.data.addProperties({ExpEndTime: experiment_time});
+                                saveData(expName + '_ID' + mTurkID + '_T' + '.csv', jsPsych.data.get().csv());
+                                //saveData(expName + '_ID' + SONAID + '_T' + experiment_time + '.csv', jsPsych.data.dataAsCSV());
+                                // if (mTurkID != "" && uniqueSubject == true){
+                                //     participantList.push(mTurkID);
+                                //     saveParticipants(participantFileName, participantList.join(","))};
+                          }
+          };
+
+    var final_block = {
+              type:   "instructions",
+              pages: secretCode,
+              timing_post_trial: transitionDelay
+          };
+
+    var repeatSubject_block = {
+              type:   "instructions",
+              pages:    repeatSubject,
+              timing_post_trial: transitionDelay
+          };
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /* CHECK REPEAT SUBJECT*/
+
+    // var mTurkIDFake = '01ABE'
+
+    // var participantFileName = "participantList.txt";
+    // var participantList = $.ajax({
+    //                 url: participantFileName,
+    //                 async: false
+    //              }).responseText;
+    // participantList = participantList.split(",");
+    //
+    // function arrayContains(needle, arrhaystack){
+    //           return (arrhaystack.indexOf(needle) > -1);
+    // };
+    //
+    // var uniqueSubject = !arrayContains(mTurkID,participantList);
+    var uniqueSubject = true;
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /* DEFINE EXPERIMENT TIMELINE */
+    var timeline = [];
+          if (uniqueSubject) {
+              timeline.push(consent_block);
+              timeline.push(play_block);
+              timeline.push(instructions_block);
+              timeline.push(test1_block);
+              timeline.push(survey_block);
+              timeline.push(debrief_block);
+              timeline.push(final_block);
+          } else {
+              timeline.push(repeatSubject_block);
+          };
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /* START EXPERIMENT*/
+    jsPsych.init({
+      timeline: timeline,
+      on_finish: function() {
+        jsPsych.data.displayData();
+      }
+    });
+
+  </script>
+</html>

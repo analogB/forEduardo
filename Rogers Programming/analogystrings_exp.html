@@ -1,0 +1,711 @@
+<!doctype html>
+<html>
+    <head>
+        <title>research study</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+        <script src="jspsych-5.0.3br2/jspsych.js"></script>
+        <script src="jspsych-5.0.3br2/plugins/jspsych-text.js"></script>
+        <script src="jspsych-5.0.3br2/plugins/jspsych-survey-text.js"></script>
+        <script src="jspsych-5.0.3br2/plugins/jspsych-survey-likert.js"></script>
+        <script src="jspsych-5.0.3br2/plugins/jspsych-survey-multi-choice.js"></script>
+        <script src="jspsych-5.0.3br2/plugins/jspsych-singlestim-multislider.js"></script>
+        <link  href="jspsych-5.0.3br2/css/jspsych.css" rel="stylesheet" type="text/css"></link>
+
+    </head>
+    <body> </body>
+    <script>
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////
+  /* DEFINE DATA FILE SAVE NAME */
+  var expName = "AnalogyStrings02"
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////
+  /* DEFINE STIMULI AND INSTRUCTION CONTENT */
+
+  var stimFilename = "textStims.txt";
+  var autoStim = false;
+
+  if (autoStim){
+    var nStims = 10;
+  }else{
+    //var nStims = test1_Array.length;
+  };
+
+  var blockSize = 2;
+  var nBlocks = 4;
+  var nA = 3; //blanks
+  var nB = 3; //blanks
+  var shadeBlanks = false;
+  var shadeTarget = false;
+  var redTarget = true;
+  var rowTitles = ['Single Person A','Single Person B'];
+
+  var transitionDelay = 300;
+  var indention =       25;
+  var turkSubmitCode =  42*42;
+
+  var radioOptions = [];
+  if (autoStim){
+    for (i=0; i<blockSize; i++){
+      radioOptions[i]='<b>'+i+'</b>';
+      //radioOptions[i] = String.fromCharCode(97+i).toUpperCase();
+    };
+    radioOptions=[radioOptions];
+  }else{
+    radioOptions=[['<b>0</b>','<b>1</b>']]; //custom
+  };
+
+  function createArray(length){
+    var arr = new Array(length || 0),
+    i = length;
+    if (arguments.length > 1) {
+      var args = Array.prototype.slice.call(arguments, 1);
+      while(i--) arr[length-1 - i] = createArray.apply(this, args);
+    };
+     return arr;
+  };
+
+  var studyTopic =
+                            "language and thinking";
+  var studyPurpose =
+                            "to better understand how people make predictions and become confident";
+  var taskDescription =
+                            "make predictions about uncertain patterns";
+  // var taskTime =
+  //                           "about 30 minutes"; //a time or a range
+  // var taskPayment =
+  //                           "the compensation offered in the Amazon Mechanical Turk listing";
+
+  var instructionExampleA =  tableMaker([{'stringA':'10101011','stringB':'01010100'}],[true,true,true,true,true]);
+  var instructionExampleB =  tableMaker([{'stringA':'11110110','stringB':'11110110'}],[true,true,true,true,true]);
+  var instructionExampleC =  tableMaker([{'stringA':'10010110','stringB':'01011100'}],[true,true,true,true,true]);
+  var instructionExampleD =  tableMaker([{'stringA':'10 01 11','stringB':'0  101? '}],[true,true,true,true,true]);
+  var instructionExampleE =  tableMaker([{'stringA':'10001011','stringB':'01110100'}],[true,true,true,true,true]);
+
+  var instructionText1 =
+                            "<i>(read instructions carefully)</i><br><br>You are a data analyst at a leading online matchmaking website that matches single people together for dates. Singles in the system are required to upload a portrait photograph and fill out a survey of yes/no personality questions. Some singles tend to answer mostly 'yes' or mostly 'no', but others vary quite a bit question to question. Matches are selected half of the time by a computer algorithm and half of the time by a professional matchmaker.<br><br>The computer algorithm analyzes the singles' survey responses and finds matches based on either strong similarity in responses (birds of a feather) or strong dissimilarity (opposites attract). The algorithm has no preference for matches based on strong similarity or strong dissimilarity. The professional matchmakers do not use the survey responses and instead rely only on their intuitions about the photographs to make matches.";
+  var instructionText2 =
+                            "Sometimes the singles do not fully complete the questionnaire. These 'incomplete' singles are placed into a separate pool for matching apart from the 'completes.' The computer algorithm and professional matchmakers still suggest matches, but matches require approval by a data analyst before they can be finalized. That's where you come in. <br><br> You have arranged the responses of suggested matches from the incomplete pool into strings of ones and zeros in order to more easily evaluate the matches. The two strings are labeled 'Single Person A' and 'Single Person B' like this.<br><br>" +
+                            instructionExampleD[0].stimulus[0].outerHTML+'<br>';
+  var instructionText3 =
+                            "To better understand the reliability of the suggested matches, you recently conducted a study asking matched incompletes to fully complete their questionnaire surveys. Your study revealed two important findings: <br><br><u>Finding #1</u> - Incomplete singles that responded mostly 'yes' or mostly 'no' continued to respond in about the same way when asked to fully complete the survey. Although this trend was reduced for singles that initially answered fewer questions, because the apparent consistency was sometimes just a coincidence. <br><br><u>Finding #2</u> - When singles matched by the computer return to complete their surveys, they tend to continue exhibiting about the same degree of similarity or dissimilarity with their suggested match. Survey responses from singles matched using only their photographs do not tend to strongly align one way or the other with their matches, although sometimes there is some alignment by lucky coincidence."
+  var instructionText4 =
+                            "You have devised a clever application for these findings to help estimate certain incomplete questions that are crucial to match success. These crucial questions are indicated by a red question mark (?). Not knowing for sure whether any presented match was created by the algorithm or the professional matchmaker, your task is to: <br><br><b>Estimate the chance from 0% to 100% that the target unknown value (?) is a 1 or 0 using slider bars.</b><br><br>You will evaluate "+nStims+" suggested matches. These should require no more than 10-20 seconds each. An example is shown below.<br><br>";
+  var instructionText5 =
+                            "Consider the complete responses for these two people that were matched together below. They gave opposite answers almost every time!<br><br>"+
+                            instructionExampleE[0].stimulus[0].outerHTML+'<br>'+
+                            "According to what you just read, were these people more likely to have been matched by the computer algorithm or the professional matchmaker?<br><br> A) equally likey <br> B) computer algorithm <br> C) professional matchmaker <br><br> Please enter A, B, or C below and briefly explain your choice:"
+  var instructionText6 =
+                            "If you would like to review the instructions you can <u>restart the HIT by refreshing your browser</u>.<br><br><b>I have fully read and understood the instructions.<b>";
+  var stimPreambleText1 =
+                            "<span style='font-size:12px; display:block; line-height:1.3; background-color:Gainsboro; padding:12px;'><b>Reference Information:</b><br>"+
+                            "<u>Finding #1</u> - Incomplete singles that responded mostly 'yes' or mostly 'no' continued to respond in about the same way when asked to fully complete the survey. Although this trend was reduced for singles that initially answered fewer questions, because the apparent consistency was sometimes just a coincidence. <br><br>"+
+                            "<u>Finding #2</u> - When singles matched by the computer return to complete their surveys, they tend to continue exhibiting about the same degree of similarity or dissimilarity with their suggested match. Survey responses from singles matched using only their photographs do not tend to strongly align one way or the other with their matches, although sometimes there is some alignment by lucky coincidence.<br><br>"+
+                            "<u>Matching Making Process</u> - Half of the time, Single 1 and Single 2 are matched based on strong similarity or dissimilarity in completed survey responses. The other half of the time they are matched based on professional matchmaker intuitions of photographs rather than survey responses.</span><br>"
+                            //"Look at the two sets of strings below with randomly hidden symbols. Your task is to determine the symbol that best fits the target which is indicated by a (?) question mark and to estimate the probability that your selection matches the true symbol of the target.";
+  var radioPreambleText1 =
+                            "Use the sliders below to indicate the chances that each possible response is correct."
+                            //Select the symbol that best fits the (?) target and indicate the chance that your response is correct using the appropriate slider:"
+  var sliderPreambleText1 =
+                            "You may play with the sliders and make a practice choice, then press the <i>Submit Answers</i> button to continue the instructions."
+  var debriefDescription =
+                            "This study is investigating how people's judgements and predictions are influenced by correspondences in structure. The investigators will compare participant responses to statistical traits of the stimuli to better understand the role of chance and probability in human judgements."; //Full sentence
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////
+  /* DEFINE CONTACT INFO */
+  function indenter(nSpaces){var out = [];
+                        for (i = 0; i < nSpaces; i++){
+                            out += "&nbsp;"};
+                        return out};
+
+  var indent = indenter(indention);
+
+  var contactLandy =    indent + "<i>Dr. David Landy, Assistant Professor<br>"+
+                        indent + "Department of Psychological and Brain Sciences, Indiana University<br>"+
+                        indent + "1101 East 10th Street, Bloomington, IN 47405<br>"+
+                        indent + "(812) 855-2012<br>"+
+                        indent + "dlandy at indiana dot edu</i></p>";
+
+  var contactInvestigator = contactLandy;
+
+  var investigatorName = "Dr. David Landy";
+  var departmentName = "Department of Psychological and Brain Sciences";
+  var institutionName = "Indiana University";
+
+ ////////////////////////////////////////////////////////////////////////////////////////////////////////
+ /* DEFINE NAVIGATION PROMPTS */
+  var keyAdvance = "<p><i>Press the spacebar to advance.</i></p>";
+  var buttonAdvance = "Make your response and click the <i>SUBMIT ANSWERS</i> button to continue.";
+  var noBrowserControl = "Note: Browser controls will not work during this task. Clicking BACKWARD or REFRESH in the browser controls will <u>reset the entire task</u>.";
+
+ ////////////////////////////////////////////////////////////////////////////////////////////////////////
+ /* DEFINE INSTRUCTIONS */
+ // var invitation =
+ //              ["You are invited to participate in a research study on "+studyTopic+", conducted by "+ investigatorName +" in the "+ departmentName + ". You have been recruited to participate through Amazon Mechanical Turk (mturk.com). Please read this form and ask any questions before agreeing to be in the study. <br><br><br>"+
+ //              noBrowserControl + "<br><br>" +
+ //              keyAdvance
+ //              ];
+
+ var invitation =
+              ["You are invited to participate in a research study on "+studyTopic+", conducted by "+ investigatorName +" in the "+ departmentName + " at "+ institutionName +". Please read this form and ask any questions before agreeing to be in the study. <br><br><br>"+
+              noBrowserControl + "<br><br>" +
+              keyAdvance
+              ];
+
+  // var consentForm =
+  //              ["<b>STATEMENT OF CONSENT</b><br>" +
+  //               "<p><b>PURPOSE OF STUDY:</b>  The purpose of this study is " + studyPurpose + ".</p>" +
+  //               "<p><b>NUMBER OF PEOPLE TAKING PART IN THE STUDY:</b> If you agree to participate, you will be one of approximately 6000 subjects who will be participating in this research program." +
+  //               // "<p><b>PROCEDURES FOR THE STUDY:</b> If you agree to be in the study, you will be presented with several straightforward tasks to complete while seated at your computer. These tasks include making judgments about different objects and topics, watching brief videos, and reading and entering text information. The entire session should take a maximum of 5, 10, 15, 30, 45, or 60 minutes, as indicated in the HIT description. You may only participate in the study once." +
+  //               "<p><b>PROCEDURES FOR THE STUDY:</b> If you agree to be in the study, you will be presented with several straightforward tasks to complete while seated at your computer. These tasks may include making judgments about different objects and topics, watching brief videos, and reading and entering text information. The entire session should take between 20 and 40 minutes. You may only participate in the study once." +
+  //               "<p><b>RISKS OF TAKING PART IN THE STUDY:</b> Participation in this study involves a potential risk of loss of confidentiality." +
+  //               "<p><b>BENEFITS OF TAKING PART IN THE STUDY:</b> An understanding of how people make predictions during conversation can help us understand how to improve communication. You benefit from this experience because you learn something about how an experiment is designed and conducted and what issues are of interest to cognitive scientists."+
+  //               "<p><b>ALTERNATIVES TO TAKING PART IN THE STUDY:</b> An alternative to participating in the study is to choose not to participate." +
+  //               // "<p><b>PAYMENT:</b> For participating in this study, you will receive a small payment, equivalent to approximately $8/hour. If this is a 5-minute study, as indicated in the HIT description, you will receive $0.67. If this is a 10-minute study, you will receive $1.33. If this is a 15-minute study, you will receive $2. If this is a 30-minute study, you will receive $4. If this is a 60-minute study, you will receive $8." +
+  //               "<p><b>CONTACTS FOR QUESTIONS OR PROBLEMS:</b> For questions about the study, contact the researcher Dr. David Landy at (812) 336-4449. <br><br>For questions about your rights as a research participant or to discuss problems, complaints or concerns about a research study, or to obtain information, or offer input, contact the IU Human Subjects Office: (812) 856-4242 or irb@iu.edu" +
+  //               "<p><b>VOLUNTARY NATURE OF STUDY:</b> Taking part in this study is voluntary.  You may choose not to take part or may leave the study at any time.  Leaving the study will not result in any penalty or loss of benefits to which you are entitled and you will be compensated for your time up to that point.  Your decision whether or not to participate in this study will not affect your current or future relations with the investigator(s)." +
+  //               "<p><b>Thank you for agreeing to participate in our research. Before you begin, please note that the data you provide may be collected and used by Amazon as per its privacy agreement. Additionally, this research is for residents of the United States over the age of 18*; if you are not a resident of the United States and/or under the age of 18, please do not complete this survey.</b>" +
+  //               "<p>Print this page if you want a copy for your records."+
+  //               "<p>Form date: November 19, 2015"+
+  //               keyAdvance];
+
+var consentForm =
+             ["<center><b>INDIANA UNIVERSITY INFORMED CONSENT STATEMENT FOR</b><br>" +
+             "<b>Perceptual Structure in Problem Solving and Reasoning</b><br></center>" +
+             "You are invited to participate in a research study of problem solving and reasoning. You were selected as a possible subject because you met the criteria for eligibility in this study. We ask that you read this form and ask any questions you may have before agreeing to be in the study.<br><br>" +
+             "The study is being conducted by Dr. David Landy in the Psychology department. It is funded by a grant through the Institute of Education Sciences (IES).<br><br>" +
+             "<b>STUDY PURPOSE:</b><br>" +
+             "The purpose of this study is to look at how people interact with problems or rules in subjects such as algebra, physics, linguistics, and grammar.<br><br>" +
+             "<b>NUMBER OF PEOPLE TAKING PART IN THE STUDY:</b><br>" +
+             "If you agree to participate, you will be one of 1000 subjects who will be participating in this research.<br><br>" +
+             "<b>PROCEDURES FOR THE STUDY:</b><br>" +
+             "If you agree to be in the study, you be asked to view stimuli, either on the computer or on paper, and perform one of the tasks below. You may also be asked to perform some tasks mentally, with your eyes closed, or with a barrier preventing your ability to see during the task.<br>" +
+             " <b>- Problem solution:</b> A set of problems is presented, and you will be asked to solve them.<br>" +
+             " <b>- Verification:</b> A problem and a potential solution are presented; you will decide whether the presented solution is correct.<br>" +
+             " <b>- Category judgment:</b> A stimulus is shown, and you will decide the category of the stimulus.<br>" +
+             " <b>- Same-different judgments:</b> You will be shown two stimuli, either simultaneously or sequentially, and are asked to decide whether they are identical.<br>" +
+             " <b>- Similarity judgment:</b> You will be shown two stimuli, either simultaneously or sequentially, and are to rate how similar they are on some scale (e.g., 1-7).<br>" +
+             " <b>- Interpretation:</b> You will be shown an equation, diagram, or stated problem, and are asked to translate it into one of the other forms. For instance, you might be shown a picture of a ball moving rightward, and be asked to write an equation characterizing its momentum (such as p=mv).<br>" +
+             " <b>- Equation writing:</b> Participants may be asked to simply copy equations or other mathematical forms.<br>" +
+             " <b>- Match to sample judgment:</b> A stimulus is briefly presented, followed by a choice of many objects presented simultaneously or sequentially, each one to be matched to the sample.<br>" +
+             " <b>- Dual-task procedure:</b> You will be asked to remember a small number of objects (1-3) over the course of a same/different matching trial.<br>" +
+             " <b>- Attention to a single dimension:</b> You will be asked to only respond on the basis of one dimension of the stimulus, such as the color, size or location.<br><br>" +
+             "<u>Your data will be collected through the use of one or both of the following techniques:</u><br>" +
+             " <b>- Computer-based:</b> In computer-based tasks, subjects will sit in front of a computer, which will present the stimuli.<br>" +
+             " <b>- Paper and pen:</b> Participants are asked to solve problems on paper, using a pen.<br>" +
+             " <b>- Spoken protocol:</b> Participants are asked to talk aloud, either to themselves or to an experimenter, and to describe their solution to particular problems.<br>" +
+             " <b>- Eye movement tracking:</b> Participants are asked to look at stimuli through an EyeLink eye tracker, and their eye movements will be recorded. You will rest your chin on a chin rest and look through the eye tracking machine lenses, which will be calibrated to adjust to your particular eye movement.<br>" +
+             " <b>- Voice/audio recordings:</b> Participants will be asked to speak or explain their answer aloud, to be recorded by an external microphone.<br><br>" +
+             "You may be asked to perform additional tasks, or fill out questionnaires regarding your general personality or academic history. These tasks will be described to you by your experimenter, and will be filled out either on the computer, or by pen and paper. The entire purpose of the research cannot be fully explained, but you will be debriefed at the end of your session. The task or tasks in total will take no more than two hours.<br><br>" +
+             "<b>RISKS OF TAKING PART IN THE STUDY:</b><br>" +
+             "While on the study, the risks are very minimal, not unlike normal daily life. This study will not adversely affect your rights or welfare. You will receive additional pertinent information about the study once the experiment is complete. Any questions on the demographics questionnaire that you do not feel comfortable answering, you may skip and leave blank. If at any time during the study you feel any discomfort or do not wish to continue, you may inform the experimenter and there will be no penalty for withdrawal from the experiment.<br><br>" +
+             "<b>BENEFITS OF TAKING PART IN THE STUDY:</b><br>" +
+             "You may not benefit directly from this study.<br><br>" +
+             "<b>ALTERNATIVES TO TAKING PART IN THE STUDY:</b><br>" +
+             "Participation in this particular study is not mandatory, and the same course credit can be obtained by participating in other experiments or writing a one page paper; please see your instructor.<br><br>" +
+             "<b>CONFIDENTIALITY:</b><br>" +
+             "Efforts will be made to keep your personal information confidential. We cannot guarantee absolute confidentiality. Your personal information may be disclosed if required by law. Your identity will be held in confidence in reports in which the study may be and databases in which results may be stored. Organizations that may inspect and/or copy your research records for quality assurance and data analysis include groups such as the study investigator and his/her research associates, the Indiana University Institutional Review Board or its designees, and (as allowed by law) state or federal agencies, specifically the Office for Human Research Protections (OHRP) who may need to access your research records.<br><br>" +
+             "<b>PAYMENT:</b><br>" +
+             "The task or tasks in total will take no more than two hours. You will receive course credit for your participation at the rate of 0.5 credit per 30 minutes.<br><br>" +
+             "<b>CONTACTS FOR QUESTIONS OR PROBLEMS:</b><br>" +
+             "For questions about the study, contact the primary researcher, Dr. David Landy, at 812-855-4525.<br>" +
+             "For questions about your rights as a research participant or to discuss problems, complaints or concerns about a research study, or to obtain information, or offer input, contact the IU Human Subjects Office at (812) 856-4242 or (800) 696-2949 or by email at irb@iu.edu <br><br>" +
+             "<b>VOLUNTARY NATURE OF STUDY:</b><br>" +
+             "Taking part in this study is voluntary. You may choose not to take part or may leave the study at any time. Leaving the study will not result in any penalty or loss of benefits to which you are entitled. Your decision whether or not to participate in this study will not affect your current or future relations with Indiana University.<br><br>" +
+             "Print this page if you want a copy for your records.<br>Study #1310530050<br>Form date: May 17, 2016" +
+              keyAdvance];
+
+  var consentVoluntary =
+               ["<p><b>STATEMENT OF CONSENT</b></p>" +
+                "<p>Taking part in this study is voluntary. You may choose not to take part or may leave the study at any time. You may withdraw by closing your web browser.</p>" +
+                keyAdvance];
+
+  var instr1 =
+               ["<b>INSTRUCTIONS</b> (1 of 6)<br>" +
+                instructionText1 +
+                keyAdvance];
+
+  var instr2 =
+               ["<b>INSTRUCTIONS</b> (2 of 6)<br>" +
+                instructionText2 +
+                keyAdvance];
+
+  var instr3 =
+               ["<b>INSTRUCTIONS</b> (3 of 6)<br>" +
+                instructionText3 +
+                keyAdvance];
+
+  var instr4 =
+               ["<b>INSTRUCTIONS</b> (4 of 6)<br>" +
+                instructionText4];
+
+  var instr5 =
+               ["<b>INSTRUCTIONS</b> (5 of 6)<br>" +
+                instructionText5];
+
+  var instr6 =
+               ["<b>INSTRUCTIONS</b> (6 of 6)<br>" +
+                instructionText6];
+
+  var stimPreamble1 =
+               [stimPreambleText1 + " " +
+               buttonAdvance +
+               "<br><br>"];
+
+  var radioPreamble1 =
+               ["<br>"+
+               radioPreambleText1 + " " +
+               "<br>"];
+
+  var sliderPreamble1 =
+               ["<br>"+
+                sliderPreambleText1 + " " +
+               "<br><br>"];
+
+  var debrief =
+               ["<b>THANK YOU</b><br>" +
+                "Thank you for participating in our study. " + debriefDescription + " If you have questions concerning this study you may contact the lead investigator:<br><br>" +
+                contactInvestigator +
+                "<p><i>Press spacebar to advance to finalize and submit your responses.</i></p>"];
+                // "<p><i>Press any key to receive the HIT code.</i></p>"];
+
+  var secretCode =
+               ["Please enter the code: <b>" + turkSubmitCode + "</b> in Mechanical Turk to complete this HIT." +
+                "<p><i>Press spacebar to finalize this task.</i></p>"];
+
+  var finalText =
+               ["<p><i>Thank you for participating in our study! Your responses have been recorded and you will receive credit within a couple of days. You may now close your browser window.</i></p>"];
+
+  var repeatSubject =
+               ["<b>Qualification Error</b><br>" +
+                "For statistical purposes, tasks for this study require unique participants. It appears that you have already participated in a task for this study. If you have questions concerning this study you may contact the lead investigator:<br>" +
+                contactInvestigator +
+                "<p><i>Please enter \"Repeat007\" for the HIT code.</i></p>"];
+
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////
+  /* DEFINE ANALOGY STRINGS FUNCTION*/
+
+  function stringMaker(nStims, blockSize, nBlocks, nA, nB){
+     /* DEFINE BLOCK 1 Strings */
+     //  var nStims = 2; blockSize = 3; var nBlocks = 4;
+    var sampleSizes = [nA,nB];
+    var stringLength = blockSize*nBlocks;
+
+    seqBlock =[];
+    for (n=0; n<blockSize; n++){
+      seqBlock[n] = n; //+1;
+    };
+
+    function flatten(array){
+      return array.reduce(function(arr, elem){
+        var items = Array.isArray(elem) ? flatten(elem) : [elem];
+        return arr.concat(items);
+       },[]);
+     };
+
+     function shuffle(array) {
+       var copy_array = array.slice(0);
+       var m = copy_array.length,t, i;
+       while(m){
+         i = Math.floor(Math.random() * m--);
+         t = copy_array[m];
+         copy_array[m] = copy_array[i];
+         copy_array[i] = t;
+       };
+       return copy_array;
+     };
+
+    var stringConditions=[];
+    for (stim=1; stim<=nStims; stim++){
+      stringConditions[stim-1]=[Math.random()>0.5,Math.random()>0.5,Math.random()>0.5,Math.random()>0.5,Math.random()>0.5]
+    };
+
+    var strings=[];
+    for (stim=0; stim<nStims; stim++){
+      var fullStringA=[];
+      var fullStringB=[];
+      var blockMap =[];
+      var blockA = [];
+      var blockB = [];
+      var blockBNums = [];
+
+      for (n=0; n<nBlocks; n++){
+        if(stringConditions[stim][0]){baseBlock=seqBlock } else {baseBlock=shuffle(seqBlock) }; //baseblock orded
+        if(stringConditions[stim][1]){blockA=   baseBlock} else {blockA=   shuffle(baseBlock)}; //baseblock repeat
+        if(stringConditions[stim][2]){baseMap=  seqBlock } else {baseMap=  shuffle(seqBlock) }; //basemap orded
+        if(stringConditions[stim][3]){blockMap= baseMap  } else {blockMap= shuffle(baseMap)  }; //basemap repeat
+
+        for (m=0; m<blockSize; m++){
+          blockBNums[m] = blockMap[blockA[m]-1];
+          blockB[m] = m; //String.fromCharCode(96+blockBNums[m]).toUpperCase();
+        };
+        fullStringA.push(blockA.toString());
+        fullStringB.push(blockB.toString());
+      };
+      strings.push([fullStringA.toString().replace(/,/gi,''),fullStringB.toString().replace(/,/gi,'')]);
+    };
+
+    seqString = [];
+    for (n=0; n<stringLength; n++){
+      seqString[n] = n
+    };
+
+    String.prototype.replaceAt=function(index, character){
+      return this.substr(0, index) + character + this.substr(index+character.length);
+    };
+
+    var stringsMasked = $.extend(true, [], strings);
+    var mask = [];
+    for (stim=0; stim<nStims; stim++){
+      mask = [shuffle(seqString).slice(0,sampleSizes[0]),shuffle(seqString).slice(0,sampleSizes[1])];
+      for (str=0; str<2; str++){
+        for (i=0; i<sampleSizes[str]; i++){
+          if (str==1 && i==0){
+            if(stringConditions[stim][4]){ //define anchoredTarget
+              notInMaskA = seqString.filter(function(x){return mask[0].indexOf(x)<0});
+              notInMaskAorB = notInMaskA.filter(function(x){return mask[1].slice(1).indexOf(x)<0});
+              anchoredTarget = shuffle(notInMaskAorB)[0]
+              stringsMasked[stim][str]=stringsMasked[stim][str].replaceAt(anchoredTarget,'?');
+            }else{ //define floatingTarget
+              isInMaskA = mask[0]
+              isInMaskAnotB = isInMaskA.filter(function(x){return mask[1].slice(1).indexOf(x)<0});
+              floatingTarget = shuffle(isInMaskAnotB)[0]
+              stringsMasked[stim][str]=stringsMasked[stim][str].replaceAt(floatingTarget,'?');
+              //stringsMasked[stim][str]=stringsMasked[stim][str].replaceAt(mask[0][i],'?');
+              //stringsMasked[stim][str]=stringsMasked[stim][str].replaceAt(mask[0].filter(function(x){return mask[1].slice(1,nB-1).indexOf(x)<0;})[0],'?');
+            };
+          }else{
+            stringsMasked[stim][str]=stringsMasked[stim][str].replaceAt(mask[str][i],' ');
+          };
+        };
+      };
+    };
+    return [stringsMasked,stringConditions]
+  };
+
+function tableMaker(stringArray){
+    //* DEFINE BLOCK 1 HTML Stimuli Tables */
+    var testStims = [];
+
+    for (stim=0; stim<stringArray.length; stim++){
+      htmlTable = [];
+      htmlTable = document.createElement('table');
+      console.log(stringArray[stim]);
+      for (var j=0; j<2; j++){
+        if (j==0){
+          string = stringArray[stim].stringA
+        }else{
+          string = stringArray[stim].stringB
+        };
+        var tableRow = document.createElement('tr');
+        for (var i=0; i<=string.length; i++){
+          var tableDatum = document.createElement('td');
+          tableDatum.style.border = '1px solid black';
+          tableDatum.style.paddingLeft =  '10px';
+          tableDatum.style.paddingRight = '10px';
+          tableDatum.style.paddingTop =   '0px';
+          tableDatum.style.paddingBottom ='0px';
+          tableDatum.style.minWidth = '10px';
+          if(i==0){
+            var cellText = document.createTextNode(rowTitles[j]);
+            tableDatum.style.fontStyle ='italic';
+          }else{
+            var cellText = document.createTextNode(string.charAt(i-1));
+            tableDatum.style.fontStyle='normal';
+            if (string.charAt(i-1)==' ' && shadeBlanks){
+              tableDatum.style.backgroundColor='#333333';
+            };
+            if (string.charAt(i-1)=='?'){
+              tableDatum.style.fontWeight='bold';
+            };
+            if (string.charAt(i-1)=='?' && shadeTarget){
+              tableDatum.style.backgroundColor='#333333';
+              tableDatum.style.color='white';
+            };
+            if (string.charAt(i-1)=='?' && !shadeTarget && redTarget){
+              tableDatum.style.color='red';
+            };
+          };
+          tableDatum.appendChild(cellText);
+          tableRow.appendChild(tableDatum);
+        };
+        htmlTable.appendChild(tableRow);
+      };
+
+      htmlTable.style.border = '2px solid black';
+      htmlTable.style.borderSpacing = '0px 1px';
+      testStims[stim] = {stimulus: [htmlTable], options: radioOptions, conditions: [stringArray[stim]] };
+    };
+    return testStims;
+  };
+
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////
+  /* READ TEST STIMULI */
+  function readStims(filename){
+    var stimList = $.ajax({
+                    url: filename,
+                    async: false
+                 }).responseText;
+    //stimList = stimList.replace(/[\n\r]/g,'');
+    //stimList = stimList.split(",");
+    stimArray = JSON.parse(stimList)
+    // stimArray = createArray(stimList.length/2,2);
+    // for (i=0; i<stimList.length/2; i++){
+    //   for (j=0; j<2; j++){
+    //     stimArray[i][j]=stimList[i*2+j];
+    //   };
+    // };
+    return stimArray
+  };
+
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////
+  /* DEFINE TEST STIMULI */
+
+  if (autoStim){
+    stringData = stringMaker(nStims,blockSize,nBlocks,nA,nB);
+    test1_Array = stringData[0];
+    test1_Conditions = stringData[1];
+  }else{
+    test1_Array = readStims(stimFilename);
+    test1_Conditions = createArray(test1_Array.length,5).fill(0);
+    var test1_ID = createArray(test1_Array.length,1).fill(null);
+    // test1_Array.forEach(function(el) {
+    //   test1_ID[el] = test1_Array[el][0]+test1_Array[el][1]
+    // });
+  };
+
+  test1_stims = tableMaker(test1_Array);
+  var nStims = test1_Array.length
+
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////////
+  /* DEFINE SAVE METHOD */
+  function saveData(filename, filedata){
+                        $.ajax({
+                              type:'post',
+                              cache: false,
+                              url: 'save_data.php', // this is the path to the above PHP script
+                              data: {filename: filename, filedata: filedata}
+                        });
+  };
+
+  function saveParticipants(filename,filedata){
+                        $.ajax({
+                              type:'post',
+                              cache: false,
+                              url: 'save_participants.php', // this is the path to the above PHP script
+                              data: {filename: filename, filedata: filedata}
+                        });
+  };
+  // var turkInfo = jsPsych.turk.turkInfo();
+  // var mTurkID =  turkInfo.workerId;
+  var mTurkID = ''
+
+  var getUrlParameter = function getUrlParameter(sParam) {
+      var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+          sURLVariables = sPageURL.split('&'),
+          sParameterName,
+          i;
+
+      for (i = 0; i < sURLVariables.length; i++) {
+          sParameterName = sURLVariables[i].split('=');
+
+          if (sParameterName[0] === sParam) {
+              return sParameterName[1] === undefined ? true : sParameterName[1];
+          }
+      }
+  };
+
+  var SONAID = getUrlParameter('sonaid');
+
+
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////
+  /* DEFINE JSPSYCH BLOCKS */
+  var invitation_block = {
+            type:   "text",
+            text:    invitation,
+            cont_key: [13,32],
+            timing_post_trial: transitionDelay
+        };
+
+  var consentForm_block = {
+            type:   "text",
+            text:   consentForm,
+            cont_key: [13,32],
+            timing_post_trial: transitionDelay
+        };
+
+  var consentVoluntary_block = {
+            type:   "text",
+            text:   consentVoluntary,
+            cont_key: [13,32],
+            timing_post_trial: transitionDelay
+        };
+
+  var instructions1_block = {
+            type:   "text",
+            text:   instr1,
+            cont_key: [13,32],
+            timing_post_trial: transitionDelay
+        };
+
+
+  var instructions2_block = {
+            type:   "text",
+            text:   instr2,
+            cont_key: [13,32],
+            timing_post_trial: transitionDelay
+        };
+
+  var instructions3_block = {
+            type:   "text",
+            text:   instr3,
+            cont_key: [13,32],
+            timing_post_trial: transitionDelay
+        };
+
+  // var instructions4_block = {
+  //           type:   "text",
+  //           text:   instr4,
+  //           cont_key: [13,32],
+  //           timing_post_trial: transitionDelay
+  //       };
+
+  var instructions4_block = {
+            type: 'singlestim-multislider',
+            is_html: true,
+            stimPreamble: instr4,
+            radioPreamble: radioPreamble1,
+            sliderPreamble: sliderPreamble1,
+            timeline: instructionExampleD,
+            timing_post_trial: transitionDelay,
+            randomize_order: false
+        };
+
+  var instructions5_block = {
+            type:   "survey-text",
+            questions: instr5,
+            rows: [5],
+            columns: [80],
+            timing_post_trial: transitionDelay
+        };
+
+  var instructions6_block = {
+            type:   "survey-multi-choice",
+            questions:   instr6,
+            options: [['agree','disagree']],
+            timing_post_trial: transitionDelay
+        };
+
+  var test1_block = {
+            type: 'singlestim-multislider',
+            is_html: true,
+            stimPreamble: stimPreamble1,
+            radioPreamble: radioPreamble1,
+            timeline: test1_stims,
+            timing_post_trial: transitionDelay,
+            randomize_order: true,
+            on_finish: function(data){}
+        };
+
+  var test2_block = {
+            type: 'singlestim-multislider',
+            is_html: true,
+            stimPreamble: stimPreamble1,
+            radioPreamble: radioPreamble1,
+            timeline: test1_stims,
+            timing_post_trial: transitionDelay,
+            randomize_order: true,
+            on_finish: function(data){}
+        };
+
+  var debrief_block = {
+            type:   "text",
+            text:   debrief,
+            cont_key: [13,32],
+            timing_post_trial: transitionDelay,
+            on_finish:  function(data){
+                              var time_foo = new Date();
+                              var experiment_time = time_foo.getTime();
+                              jsPsych.data.addProperties({turkID: mTurkID});
+                              jsPsych.data.addProperties({sonaID: SONAID});
+                              jsPsych.data.addProperties({ExpEndTime: experiment_time});
+                              // saveData(expName + '_ID' + mTurkID + '_T' + experiment_time + '.csv', jsPsych.data.dataAsCSV());
+                              saveData(expName + '_ID' + SONAID + '_T' + experiment_time + '.csv', jsPsych.data.dataAsCSV());
+                              if (mTurkID != "" && uniqueSubject == true){
+                                  participantList.push(mTurkID);
+                                  saveParticipants(participantFileName, participantList.join(","))};
+                        }
+        };
+
+  var final_block = {
+            type:   "text",
+            text:   finalText,
+            cont_key: [13,32],
+            timing_post_trial: transitionDelay
+        };
+
+  var repeatSubject_block = {
+            type:   "text",
+            text:    repeatSubject,
+            cont_key: [13,32],
+            timing_post_trial: transitionDelay
+        };
+
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////
+  /* CHECK REPEAT SUBJECT*/
+
+  // var mTurkIDFake = '01ABE'
+
+  var participantFileName = "participantList.txt";
+  // var participantList = $.ajax({
+  //                 url: participantFileName,
+  //                 async: false
+  //              }).responseText;
+  // participantList = participantList.split(",");
+  //
+  // function arrayContains(needle, arrhaystack){
+  //           return (arrhaystack.indexOf(needle) > -1);
+  // };
+  //
+  // var uniqueSubject = !arrayContains(mTurkID,participantList);
+  var uniqueSubject = true;
+
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////
+  /* DEFINE EXPERIMENT TIMELINE */
+  var timeline = [];
+        timeline.push(invitation_block);
+        if (uniqueSubject) {
+            timeline.push(consentForm_block);
+            timeline.push(consentVoluntary_block);
+            timeline.push(instructions1_block);
+            timeline.push(instructions2_block);
+            timeline.push(instructions3_block);
+            timeline.push(instructions4_block);
+            timeline.push(instructions5_block);
+            timeline.push(instructions6_block);
+            timeline.push(test1_block);
+            timeline.push(test2_block);
+            timeline.push(debrief_block);
+            timeline.push(final_block);
+        } else {
+            timeline.push(repeatSubject_block);
+        };
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////
+  /* START EXPERIMENT*/
+  jsPsych.init({
+        timeline: timeline,
+        on_finish: function() {
+              // jsPsych.data.displayData();
+            }
+        });
+
+    </script>
+</html>
